@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="description" content="Calculadora de Estructura FV - Calcula estructura, omegas y zetas">
+    <title>Calculadora de Estructura FV</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #1e293b;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .icon-sun {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #d1d5db;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-calculate {
+            background: #2563eb;
+            color: white;
+        }
+        .btn-calculate:hover {
+            background: #1d4ed8;
+        }
+        .btn-clear {
+            background: #6b7280;
+            color: white;
+        }
+        .btn-clear:hover {
+            background: #4b5563;
+        }
+        .results {
+            margin-top: 30px;
+        }
+        .result-item {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .result-estructura {
+            background: linear-gradient(to right, #dbeafe, #bfdbfe);
+            border-left: 4px solid #2563eb;
+        }
+        .result-omegas {
+            background: linear-gradient(to right, #dcfce7, #bbf7d0);
+            border-left: 4px solid #16a34a;
+        }
+        .result-zetas {
+            background: linear-gradient(to right, #f3e8ff, #e9d5ff);
+            border-left: 4px solid #9333ea;
+        }
+        .result-label {
+            font-weight: 600;
+            color: #374151;
+        }
+        .result-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .result-estructura .result-value {
+            color: #2563eb;
+        }
+        .result-omegas .result-value {
+            color: #16a34a;
+        }
+        .result-zetas .result-value {
+            color: #9333ea;
+        }
+        .info-button {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37,99,235,0.4);
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        .info-button:hover {
+            background: #1d4ed8;
+            transform: scale(1.05);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .modal-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        .modal-text {
+            font-size: 18px;
+            color: #374151;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+        .btn-close {
+            background: #2563eb;
+            color: white;
+            padding: 12px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-close:hover {
+            background: #1d4ed8;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon-sun">☀️</div>
+            <h1>Calculadora de Estructura FV</h1>
+        </div>
+        
+        <div class="card">
+            <div class="input-group">
+                <label for="paneles">Número de Paneles</label>
+                <input type="number" id="paneles" inputmode="numeric" placeholder="0" min="0">
+            </div>
+            
+            <div class="input-group">
+                <label for="columnas">Número de Columnas</label>
+                <input type="number" id="columnas" inputmode="numeric" placeholder="0" min="0">
+            </div>
+            
+            <div class="button-group">
+                <button class="btn-calculate" onclick="calcular()">Calcular</button>
+                <button class="btn-clear" onclick="limpiar()">Limpiar</button>
+            </div>
+            
+            <div id="resultados" class="results hidden">
+                <div class="result-item result-estructura">
+                    <span class="result-label">Estructura:</span>
+                    <span class="result-value" id="valor-estructura">0</span>
+                </div>
+                <div class="result-item result-omegas">
+                    <span class="result-label">Omegas:</span>
+                    <span class="result-value" id="valor-omegas">0</span>
+                </div>
+                <div class="result-item result-zetas">
+                    <span class="result-label">Zetas:</span>
+                    <span class="result-value" id="valor-zetas">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button class="info-button" onclick="mostrarInfo()">ℹ️</button>
+    
+    <div id="modal" class="modal" onclick="cerrarInfo(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-icon">☀️</div>
+            <p class="modal-text">App gratuita diseñada por Juan Durán Ramallo</p>
+            <button class="btn-close" onclick="cerrarInfo()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+
+        function calcular() {
+            const paneles = parseInt(document.getElementById('paneles').value) || 0;
+            const columnas = parseInt(document.getElementById('columnas').value) || 0;
+            
+            const estructura = (paneles * 2) + (columnas * 2);
+            const zetas = columnas * 4;
+            const omegas = estructura - zetas;
+            
+            document.getElementById('valor-estructura').textContent = estructura;
+            document.getElementById('valor-omegas').textContent = omegas;
+            document.getElementById('valor-zetas').textContent = zetas;
+            document.getElementById('resultados').classList.remove('hidden');
+        }
+        
+        function limpiar() {
+            document.getElementById('paneles').value = '';
+            document.getElementById('columnas').value = '';
+            document.getElementById('resultados').classList.add('hidden');
+        }
+        
+        function mostrarInfo() {
+            document.getElementById('modal').classList.add('active');
+        }
+        
+        function cerrarInfo(event) {
+            if (!event || event.target.id === 'modal') {
+                document.getElementById('modal').classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
